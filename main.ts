@@ -288,6 +288,7 @@ let interval = 1000
 let kill_count = 0
 let bonus_missiles = 0
 let speed_mult = 0
+let player_dead = false
 let last_bogey_x = scene.screenWidth() / 2
 if (difficulty == true) {
     min_speed = 5
@@ -301,10 +302,14 @@ if (difficulty == true) {
     upgrade_speed = 50
 }
 
-controller.A.repeatInterval = 1000
+controller.A.repeatInterval = 300
 controller.A.repeatDelay = 0
-// pause(300)
+//     pause(300)
 controller.A.onEvent(ControllerButtonEvent.Repeated, function on_a_pressed() {
+    if (player_dead == true) {
+        return
+    }
+    
     
     // for i in range(3):
     let missile = sprites.createProjectileFromSprite(missile_array[missile_type], spacePlane, 0, -200)
@@ -405,10 +410,11 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_overlap2(spri
     let i: number;
     // player crashes into enemy
     
-    info.changeLifeBy(-1)
+    player_dead = true
     // sprite.set_velocity(25, 25)
     sprite.startEffect(effects.disintegrate, 1000)
     otherSprite.destroy(effects.disintegrate, 1000)
+    info.changeScoreBy(1)
     controller.moveSprite(sprite, 0, 0)
     scene.cameraShake(4, 1000)
     for (i = 0; i < 1; i++) {
@@ -434,10 +440,13 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_overlap2(spri
     `)
     let enemy_array = sprites.allOfKind(SpriteKind.Enemy)
     for (i = 0; i < enemy_array.length; i++) {
+        info.changeScoreBy(1)
         enemy_array[i].destroy()
     }
     sprite.setPosition(scene.screenWidth() / 2, scene.screenHeight())
     controller.moveSprite(spacePlane, 200, 0)
+    info.changeLifeBy(-1)
+    player_dead = false
     missile_type = 0
     temp_dead_count = 0
     temp_killed_count = 0
@@ -445,6 +454,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_overlap2(spri
     upgrade_level = 0
     last_bogey_x = scene.screenWidth() / 2
     kill_count = Math.round(kill_count / 2) - kill_count % 20 + 1
+    interval = interval * 1.25
     speed_mult = 0
 })
 sprites.onDestroyed(SpriteKind.Enemy, function on_destroyed(sprite: Sprite) {

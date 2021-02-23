@@ -283,6 +283,7 @@ interval = 1000
 kill_count = 0
 bonus_missiles = 0
 speed_mult = 0
+player_dead = False
 last_bogey_x = scene.screen_width() / 2
 if difficulty == True:
     min_speed = 5
@@ -295,10 +296,12 @@ else:
     y_speed = 50
     upgrade_speed = 50
 
-controller.A.repeatInterval = 1000
+controller.A.repeatInterval = 300
 controller.A.repeatDelay = 0
 
 def on_a_pressed():
+    if player_dead == True:
+        return
     global bonus_missiles
     #for i in range(3):
     missile = sprites.create_projectile_from_sprite(missile_array[missile_type], spacePlane, 0, -200)
@@ -308,7 +311,7 @@ def on_a_pressed():
         bonus_missiles += 1
     elif missile_type == 3:
         bonus_missiles += 1
-        #pause(300)
+    #    pause(300)
 controller.A.on_event(ControllerButtonEvent.REPEATED, on_a_pressed)
 
 def create_bogey():
@@ -373,7 +376,7 @@ def on_forever():
 forever(on_forever)
 
 def on_overlap(sprite, otherSprite): #player shoots enemy
-    global kill_count, hit_streak, temp_killed_count, upgrade_level
+    global kill_count, hit_streak, temp_killed_count
     otherSprite.destroy(effects.fire, 50)
     sprite.destroy()
     info.change_score_by(2)
@@ -389,11 +392,12 @@ def on_overlap(sprite, otherSprite): #player shoots enemy
 sprites.on_overlap(SpriteKind.projectile, SpriteKind.enemy, on_overlap)
 
 def on_overlap2(sprite, otherSprite): #player crashes into enemy
-    global missile_type, hit_streak, temp_dead_count, temp_killed_count, upgrade_level, kill_count, last_bogey_x, speed_mult
-    info.change_life_by(-1)
+    global player_dead, missile_type, hit_streak, temp_dead_count, temp_killed_count, upgrade_level, kill_count, last_bogey_x, speed_mult, interval
+    player_dead = True
     #sprite.set_velocity(25, 25)
     sprite.start_effect(effects.disintegrate, 1000)
     otherSprite.destroy(effects.disintegrate, 1000)
+    info.change_score_by(1)
     controller.move_sprite(sprite, 0, 0)
     scene.camera_shake(4,1000)
     for i in range(1):
@@ -418,9 +422,12 @@ def on_overlap2(sprite, otherSprite): #player crashes into enemy
     """))
     enemy_array = sprites.all_of_kind(SpriteKind.enemy)
     for i in range(len(enemy_array)):
+        info.change_score_by(1)
         enemy_array[i].destroy()
     sprite.set_position(scene.screen_width() / 2, scene.screen_height())
     controller.move_sprite(spacePlane, 200, 0)
+    info.change_life_by(-1)
+    player_dead = False
     missile_type = 0
     temp_dead_count = 0
     temp_killed_count = 0
@@ -428,6 +435,7 @@ def on_overlap2(sprite, otherSprite): #player crashes into enemy
     upgrade_level = 0
     last_bogey_x = scene.screen_width() / 2
     kill_count = Math.round(kill_count / 2) - (kill_count % 20) + 1
+    interval = interval * 1.25
     speed_mult = 0
 sprites.on_overlap(SpriteKind.player, SpriteKind.enemy, on_overlap2)
 
