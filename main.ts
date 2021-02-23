@@ -1,4 +1,8 @@
 let i: number;
+let min_speed: number;
+let max_speed: number;
+let y_speed: number;
+let upgrade_speed: number;
 namespace SpriteKind {
     export const Upgrade = SpriteKind.create()
 }
@@ -129,8 +133,8 @@ for (i = 0; i < 1; i++) {
     pause(1000)
 }
 scene.setBackgroundImage(null)
-game.showLongText("1 point for each kill. Lose 1 point for each enemy that gets past you. Hit 20 for an upgrade box. 3 levels of upgraded weapons.", DialogLayout.Center)
-// game.splash("1 point for each enemy destroyed", "lose 1 point for each enemy that gets past you.")
+game.showLongText("Hit multiple enemies in a row for an upgrade box. 3 levels of upgraded weapons.", DialogLayout.Center)
+let difficulty = game.ask("Press A for Easy mode", "or B for Hard mode.")
 set_starfield()
 let spacePlane = sprites.create(img`
     . . . . . . . . . . . . . . . .
@@ -151,7 +155,7 @@ let spacePlane = sprites.create(img`
     . . . . . . . . . . . . . . . .
 `, SpriteKind.Player)
 spacePlane.setPosition(scene.screenWidth() / 2, scene.screenHeight())
-controller.moveSprite(spacePlane, 200, 200)
+controller.moveSprite(spacePlane, 200, 0)
 spacePlane.setStayInScreen(true)
 info.setLife(3)
 let missile_array = [img`
@@ -285,8 +289,24 @@ let kill_count = 0
 let bonus_missiles = 0
 let speed_mult = 0
 let last_bogey_x = scene.screenWidth() / 2
-controller.A.onEvent(ControllerButtonEvent.Pressed, function on_a_pressed() {
+if (difficulty == true) {
+    min_speed = 5
+    max_speed = 10
+    y_speed = 20
+    upgrade_speed = 20
+} else {
+    min_speed = 30
+    max_speed = 40
+    y_speed = 50
+    upgrade_speed = 50
+}
+
+controller.A.repeatInterval = 1000
+controller.A.repeatDelay = 0
+// pause(300)
+controller.A.onEvent(ControllerButtonEvent.Repeated, function on_a_pressed() {
     
+    // for i in range(3):
     let missile = sprites.createProjectileFromSprite(missile_array[missile_type], spacePlane, 0, -200)
     if (missile_type == 3 && bonus_missiles % 3 == 1) {
         missile = sprites.createProjectileFromSprite(missile_array[1], spacePlane, 200, -200)
@@ -317,15 +337,15 @@ function create_bogey() {
         . . . . . . . . . . . . . . . .
         . . . . . . . . . . . . . . . .
         `, SpriteKind.Enemy)
-    bogey.setVelocity(0, randint(30 + speed_mult, 40 + speed_mult))
+    bogey.setVelocity(0, randint(min_speed + speed_mult, max_speed + speed_mult))
     bogey.setPosition(Math.constrain(randint(10, scene.screenWidth() - 10), Math.constrain(last_bogey_x - scene.screenWidth() / 4 - 10, 10, scene.screenWidth() - 10), Math.constrain(last_bogey_x + scene.screenWidth() / 4 + 10, 10, scene.screenWidth() - 10)), 0)
     bogey.setFlag(SpriteFlag.AutoDestroy, true)
     last_bogey_x = bogey.x
     if (missile_type > 0 && Math.percentChance(10 + speed_mult)) {
         if (bogey.x > scene.screenWidth() / 2) {
-            bogey.vx = randint(-10, -50)
+            bogey.vx = randint(-10, y_speed * -1)
         } else {
-            bogey.vx = randint(10, 50)
+            bogey.vx = randint(10, y_speed)
         }
         
         bogey.setImage(img`
@@ -417,7 +437,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_overlap2(spri
         enemy_array[i].destroy()
     }
     sprite.setPosition(scene.screenWidth() / 2, scene.screenHeight())
-    controller.moveSprite(spacePlane, 200, 200)
+    controller.moveSprite(spacePlane, 200, 0)
     missile_type = 0
     temp_dead_count = 0
     temp_killed_count = 0
@@ -499,7 +519,7 @@ function spawn_upgrade(num: number) {
     
     upgrade_level = num + 1
     let upgrade_box = sprites.create(upgrades_array[num], SpriteKind.Upgrade)
-    upgrade_box.setVelocity(0, 50)
+    upgrade_box.setVelocity(0, upgrade_speed)
     upgrade_box.setPosition(randint(10, scene.screenWidth() - 10), 0)
     upgrade_box.setFlag(SpriteFlag.AutoDestroy, true)
 }
