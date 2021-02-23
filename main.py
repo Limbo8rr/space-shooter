@@ -125,7 +125,7 @@ scene.set_background_image(img("""
     ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 """))
 for i in range(1):
-    pause(1500)
+    pause(1200)
 scene.set_background_image(None)
 game.show_long_text("1 point for each kill. Lose 1 point for each enemy that gets past you. Hit 20 in an upgrade box. 3 levels of upgraded weapons.", DialogLayout.CENTER)
 #game.splash("1 point for each enemy destroyed", "lose 1 point for each enemy that gets past you.")
@@ -281,12 +281,17 @@ temp_killed_count = 0
 upgrade_level = 0
 interval = 1000
 kill_count = 0
+bonus_missiles = 0
 
 def on_a_pressed():
+    global bonus_missiles
     missile = sprites.create_projectile_from_sprite(missile_array[missile_type], spacePlane, 0, -200)
-    if missile_type == 3:
+    if missile_type == 3 and bonus_missiles % 3 == 1 :
         missile = sprites.create_projectile_from_sprite(missile_array[1], spacePlane, 200, -200)
         missile = sprites.create_projectile_from_sprite(missile_array[1], spacePlane, -200, -200)
+        bonus_missiles += 1
+    elif missile_type == 3:
+        bonus_missiles += 1
 controller.A.on_event(ControllerButtonEvent.PRESSED, on_a_pressed)
 
 def create_bogey():

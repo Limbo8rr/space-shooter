@@ -126,7 +126,7 @@ scene.setBackgroundImage(img`
     ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 `)
 for (i = 0; i < 1; i++) {
-    pause(1500)
+    pause(1200)
 }
 scene.setBackgroundImage(null)
 game.showLongText("1 point for each kill. Lose 1 point for each enemy that gets past you. Hit 20 in an upgrade box. 3 levels of upgraded weapons.", DialogLayout.Center)
@@ -282,11 +282,16 @@ let temp_killed_count = 0
 let upgrade_level = 0
 let interval = 1000
 let kill_count = 0
+let bonus_missiles = 0
 controller.A.onEvent(ControllerButtonEvent.Pressed, function on_a_pressed() {
+    
     let missile = sprites.createProjectileFromSprite(missile_array[missile_type], spacePlane, 0, -200)
-    if (missile_type == 3) {
+    if (missile_type == 3 && bonus_missiles % 3 == 1) {
         missile = sprites.createProjectileFromSprite(missile_array[1], spacePlane, 200, -200)
         missile = sprites.createProjectileFromSprite(missile_array[1], spacePlane, -200, -200)
+        bonus_missiles += 1
+    } else if (missile_type == 3) {
+        bonus_missiles += 1
     }
     
 })
