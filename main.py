@@ -125,29 +125,29 @@ scene.set_background_image(img("""
     ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 """))
 for i in range(1):
-    pause(1200)
+    pause(1000)
 scene.set_background_image(None)
-game.show_long_text("1 point for each kill. Lose 1 point for each enemy that gets past you. Hit 20 in an upgrade box. 3 levels of upgraded weapons.", DialogLayout.CENTER)
+game.show_long_text("1 point for each kill. Lose 1 point for each enemy that gets past you. Hit 20 for an upgrade box. 3 levels of upgraded weapons.", DialogLayout.CENTER)
 #game.splash("1 point for each enemy destroyed", "lose 1 point for each enemy that gets past you.")
 set_starfield()
 spacePlane = sprites.create(img("""
-        . . . . . . . . . . . . . . . .
-        . . . . . . . . . . . . . . . .
-        . . . . . . . 8 . . . . . . . .
-        . . . . . . . 8 . . . . . . . .
-        . . . . . . 8 8 8 . . . . . . .
-        . . . . . . 8 8 8 . . . . . . .
-        . . . . . 8 6 8 6 8 . . . . . .
-        . . . . . 8 6 8 6 8 . . . . . .
-        . . . . 8 6 7 8 7 6 8 . . . . .
-        . . . 7 8 6 7 8 7 6 8 7 . . . .
-        . 7 7 8 6 7 7 8 7 7 6 8 7 7 . .
-        . . . . . . 5 8 5 . . . . . . .
-        . . . . . . 2 . 2 . . . . . . .
-        . . . . . . . . . . . . . . . .
-        . . . . . . . . . . . . . . . .
-        . . . . . . . . . . . . . . . .
-    """),SpriteKind.player)
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . 8 . . . . . . . .
+    . . . . . . . 8 . . . . . . . .
+    . . . . . . 8 8 8 . . . . . . .
+    . . . . . . 8 8 8 . . . . . . .
+    . . . . . 8 6 8 6 8 . . . . . .
+    . . . . . 8 6 8 6 8 . . . . . .
+    . . . . 8 6 7 8 7 6 8 . . . . .
+    . . . 7 8 6 7 8 7 6 8 7 . . . .
+    . 7 7 8 6 7 7 8 7 7 6 8 7 7 . .
+    . . . . . . 5 8 5 . . . . . . .
+    . . . . . . 2 . 2 . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+"""),SpriteKind.player)
 spacePlane.set_position(scene.screen_width() / 2, scene.screen_height())
 controller.move_sprite(spacePlane, 200, 200)
 spacePlane.set_stay_in_screen(True)
@@ -223,23 +223,23 @@ missile_array = [img("""
         . . . . . . . . . . . . . . . .
     """)]
 upgrades_array = [img("""
-        . . . . . . . . . . . . . . . .
-        . . . . . . . . . . . . . . . .
-        . 2 2 2 2 2 2 2 2 2 2 2 2 2 . .
-        . 2 2 2 2 2 2 2 2 2 2 2 2 2 . .
-        . 2 2 f 2 2 f 2 f f f f 2 2 . .
-        . 2 2 f 2 2 f 2 f 2 2 f 2 2 . .
-        . 2 2 f 2 2 f 2 f 2 2 f 2 2 . .
-        . 2 2 f 2 2 f 2 f f f f 2 2 . .
-        . 2 2 f 2 2 f 2 f 2 2 2 2 2 . .
-        . 2 2 f f f f 2 f 2 2 2 2 2 . .
-        . 2 2 2 2 2 2 2 2 2 2 2 2 2 . .
-        . 2 2 2 2 2 2 2 2 2 2 2 2 2 . .
-        . . . . . . . . . . . . . . . .
-        . . . . . . . . . . . . . . . .
-        . . . . . . . . . . . . . . . .
-        . . . . . . . . . . . . . . . .
-    """),img("""
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . 2 2 2 2 2 2 2 2 2 2 2 2 2 . .
+    . 2 2 2 2 2 2 2 2 2 2 2 2 2 . .
+    . 2 2 f 2 2 f 2 f f f f 2 2 . .
+    . 2 2 f 2 2 f 2 f 2 2 f 2 2 . .
+    . 2 2 f 2 2 f 2 f 2 2 f 2 2 . .
+    . 2 2 f 2 2 f 2 f f f f 2 2 . .
+    . 2 2 f 2 2 f 2 f 2 2 2 2 2 . .
+    . 2 2 f f f f 2 f 2 2 2 2 2 . .
+    . 2 2 2 2 2 2 2 2 2 2 2 2 2 . .
+    . 2 2 2 2 2 2 2 2 2 2 2 2 2 . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+"""),img("""
         . . . . . . . . . . . . . . . .
         . . . . . . . . . . . . . . . .
         . 2 8 2 8 2 8 2 8 2 8 2 8 2 . .
@@ -282,6 +282,10 @@ upgrade_level = 0
 interval = 1000
 kill_count = 0
 bonus_missiles = 0
+speed_mult = 0
+last_bogey_x = scene.screen_width() / 2
+
+
 
 def on_a_pressed():
     global bonus_missiles
@@ -295,6 +299,7 @@ def on_a_pressed():
 controller.A.on_event(ControllerButtonEvent.PRESSED, on_a_pressed)
 
 def create_bogey():
+    global last_bogey_x
     bogey = sprites.create(img("""
         . . . . . . . . . . . . . . . .
         . . . . . . . . . . . . . . . .
@@ -313,15 +318,44 @@ def create_bogey():
         . . . . . . . . . . . . . . . .
         . . . . . . . . . . . . . . . .
         """), SpriteKind.enemy)
-    bogey.set_velocity(0, 35)
-    bogey.set_position(randint(10, scene.screen_width() - 10), 0)   
+    bogey.set_velocity(0, randint(30+ speed_mult, 40+ speed_mult)) 
+    bogey.set_position(
+        Math.constrain(randint(10, scene.screen_width() - 10), 
+        Math.constrain((last_bogey_x - scene.screen_width() / 4 - 20), 10, scene.screen_width() - 10), 
+        Math.constrain((last_bogey_x + scene.screen_width() / 4 + 20), 10, scene.screen_width() - 10)), 
+        0)
     bogey.set_flag(SpriteFlag.AutoDestroy, True)
+    last_bogey_x = bogey.x
+    if missile_type > 0 and Math.percent_chance(10 + speed_mult):
+        if bogey.x > scene.screen_width() / 2:
+            bogey.vx = randint(-10, -50)
+        else:
+            bogey.vx = randint(10, 50)
+        bogey.set_image(img("""
+            . . . . . . . . . . . . . . . .
+            . . . . . . . . . . . . . . . .
+            . . . . . a a . . a a . . . . .
+            . . . . . a a . . a a . . . . .
+            . . . . a . . . . . . a . . . .
+            . . . a . . . . . . . . a . . .
+            . . a . 2 2 2 2 2 2 2 2 . a . .
+            . . . . 5 2 2 2 2 2 2 5 . . . .
+            . . . . . 5 2 2 2 2 5 . . . . .
+            . . . . . . 5 2 2 5 . . . . . .
+            . . . . . . . 5 5 . . . . . . .
+            . . . . . . . . . . . . . . . .
+            . . . . . . . . . . . . . . . .
+            . . . . . . . . . . . . . . . .
+            . . . . . . . . . . . . . . . .
+            . . . . . . . . . . . . . . . .
+        """))
+
 
 def on_forever():
     global kill_count, interval
     create_bogey()
     pause(interval)
-    if (kill_count % 20) == 0:
+    if ((kill_count % 20) == 0) and kill_count != 0:
         interval = Math.constrain(interval *.8, 400, 1000)
 forever(on_forever)
 
@@ -342,7 +376,7 @@ def on_overlap(sprite, otherSprite): #player shoots enemy
 sprites.on_overlap(SpriteKind.projectile, SpriteKind.enemy, on_overlap)
 
 def on_overlap2(sprite, otherSprite): #player crashes into enemy
-    global missile_type, hit_streak, temp_dead_count, temp_killed_count, upgrade_level, interval
+    global missile_type, hit_streak, temp_dead_count, temp_killed_count, upgrade_level, interval, last_bogey_x, speed_mult
     info.change_life_by(-1)
     #sprite.set_velocity(25, 25)
     sprite.start_effect(effects.disintegrate, 1000)
@@ -379,7 +413,9 @@ def on_overlap2(sprite, otherSprite): #player crashes into enemy
     temp_killed_count = 0
     hit_streak = 0
     upgrade_level = 0
+    last_bogey_x = scene.screen_width() / 2
     interval = Math.constrain((interval * 1.25), 400, 1000)
+    speed_mult = 0
 sprites.on_overlap(SpriteKind.player, SpriteKind.enemy, on_overlap2)
 
 def on_destroyed(sprite):
@@ -450,8 +486,10 @@ def spawn_upgrade(num):
     upgrade_box.set_flag(SpriteFlag.AutoDestroy, True)
 
 def on_overlap3(sprite, otherSprite): #player shoots upgrade box
-    global missile_type, hit_streak
+    global missile_type, hit_streak, speed_mult
     otherSprite.destroy(effects.smiles,250)
     missile_type = upgrade_level
     hit_streak = 0
+    if missile_type == 3:
+        speed_mult = 5 * Math.round(Math.constrain(kill_count / 20, 1, 10))
 sprites.on_overlap(SpriteKind.projectile, SpriteKind.Upgrade, on_overlap3)
