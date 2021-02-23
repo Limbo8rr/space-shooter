@@ -321,8 +321,8 @@ def create_bogey():
     bogey.set_velocity(0, randint(30+ speed_mult, 40+ speed_mult)) 
     bogey.set_position(
         Math.constrain(randint(10, scene.screen_width() - 10), 
-        Math.constrain((last_bogey_x - scene.screen_width() / 4 - 20), 10, scene.screen_width() - 10), 
-        Math.constrain((last_bogey_x + scene.screen_width() / 4 + 20), 10, scene.screen_width() - 10)), 
+        Math.constrain((last_bogey_x - scene.screen_width() / 4 - 10), 10, scene.screen_width() - 10), 
+        Math.constrain((last_bogey_x + scene.screen_width() / 4 + 10), 10, scene.screen_width() - 10)), 
         0)
     bogey.set_flag(SpriteFlag.AutoDestroy, True)
     last_bogey_x = bogey.x
@@ -369,9 +369,9 @@ def on_overlap(sprite, otherSprite): #player shoots enemy
     temp_killed_count += 1
     if ((hit_streak == 20) or (hit_streak > 20 and hit_streak % 20 == 0)) and missile_type == 0:
         spawn_upgrade(0)
-    if ((hit_streak == 20) or (hit_streak > 20 and hit_streak % 20 == 0)) and missile_type == 1:
+    if ((hit_streak == 30) or (hit_streak > 30 and hit_streak % 20 == 0)) and missile_type == 1:
         spawn_upgrade(1)
-    if ((hit_streak == 20) or (hit_streak > 20 and hit_streak % 20 == 0)) and missile_type == 2:
+    if ((hit_streak == 40) or (hit_streak > 40 and hit_streak % 20 == 0)) and missile_type == 2:
         spawn_upgrade(2)
 sprites.on_overlap(SpriteKind.projectile, SpriteKind.enemy, on_overlap)
 

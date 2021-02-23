@@ -318,7 +318,7 @@ function create_bogey() {
         . . . . . . . . . . . . . . . .
         `, SpriteKind.Enemy)
     bogey.setVelocity(0, randint(30 + speed_mult, 40 + speed_mult))
-    bogey.setPosition(Math.constrain(randint(10, scene.screenWidth() - 10), Math.constrain(last_bogey_x - scene.screenWidth() / 4 - 20, 10, scene.screenWidth() - 10), Math.constrain(last_bogey_x + scene.screenWidth() / 4 + 20, 10, scene.screenWidth() - 10)), 0)
+    bogey.setPosition(Math.constrain(randint(10, scene.screenWidth() - 10), Math.constrain(last_bogey_x - scene.screenWidth() / 4 - 10, 10, scene.screenWidth() - 10), Math.constrain(last_bogey_x + scene.screenWidth() / 4 + 10, 10, scene.screenWidth() - 10)), 0)
     bogey.setFlag(SpriteFlag.AutoDestroy, true)
     last_bogey_x = bogey.x
     if (missile_type > 0 && Math.percentChance(10 + speed_mult)) {
@@ -372,11 +372,11 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function on_overlap(s
         spawn_upgrade(0)
     }
     
-    if ((hit_streak == 20 || hit_streak > 20 && hit_streak % 20 == 0) && missile_type == 1) {
+    if ((hit_streak == 30 || hit_streak > 30 && hit_streak % 20 == 0) && missile_type == 1) {
         spawn_upgrade(1)
     }
     
-    if ((hit_streak == 20 || hit_streak > 20 && hit_streak % 20 == 0) && missile_type == 2) {
+    if ((hit_streak == 40 || hit_streak > 40 && hit_streak % 20 == 0) && missile_type == 2) {
         spawn_upgrade(2)
     }
     
