@@ -355,7 +355,7 @@ forever(function on_forever() {
     create_bogey()
     pause(interval)
     if (kill_count % 20 == 0 && kill_count != 0) {
-        interval = Math.constrain(interval * .8, 400, 1000)
+        interval = Math.round(Math.constrain(interval * .9, 250, 1000))
     }
     
 })
@@ -424,7 +424,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_overlap2(spri
     hit_streak = 0
     upgrade_level = 0
     last_bogey_x = scene.screenWidth() / 2
-    interval = Math.constrain(interval * 1.25, 400, 1000)
+    kill_count = Math.round(kill_count / 2) - kill_count % 20 + 1
     speed_mult = 0
 })
 sprites.onDestroyed(SpriteKind.Enemy, function on_destroyed(sprite: Sprite) {

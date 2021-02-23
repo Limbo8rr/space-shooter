@@ -352,11 +352,11 @@ def create_bogey():
 
 
 def on_forever():
-    global kill_count, interval
+    global interval
     create_bogey()
     pause(interval)
     if ((kill_count % 20) == 0) and kill_count != 0:
-        interval = Math.constrain(interval *.8, 400, 1000)
+        interval = Math.round(Math.constrain(interval *.9, 250, 1000))
 forever(on_forever)
 
 def on_overlap(sprite, otherSprite): #player shoots enemy
@@ -376,7 +376,7 @@ def on_overlap(sprite, otherSprite): #player shoots enemy
 sprites.on_overlap(SpriteKind.projectile, SpriteKind.enemy, on_overlap)
 
 def on_overlap2(sprite, otherSprite): #player crashes into enemy
-    global missile_type, hit_streak, temp_dead_count, temp_killed_count, upgrade_level, interval, last_bogey_x, speed_mult
+    global missile_type, hit_streak, temp_dead_count, temp_killed_count, upgrade_level, kill_count, last_bogey_x, speed_mult
     info.change_life_by(-1)
     #sprite.set_velocity(25, 25)
     sprite.start_effect(effects.disintegrate, 1000)
@@ -414,7 +414,7 @@ def on_overlap2(sprite, otherSprite): #player crashes into enemy
     hit_streak = 0
     upgrade_level = 0
     last_bogey_x = scene.screen_width() / 2
-    interval = Math.constrain((interval * 1.25), 400, 1000)
+    kill_count = Math.round(kill_count / 2) - (kill_count % 20) + 1
     speed_mult = 0
 sprites.on_overlap(SpriteKind.player, SpriteKind.enemy, on_overlap2)
 
