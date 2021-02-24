@@ -1,6 +1,7 @@
 @namespace
 class SpriteKind:
     Upgrade = SpriteKind.create()
+    badprojectile = SpriteKind.create()
 
 scene.set_background_image(img("""
     ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
@@ -127,7 +128,7 @@ scene.set_background_image(img("""
 for i in range(1):
     pause(1000)
 scene.set_background_image(None)
-game.show_long_text("Hit multiple enemies in a row for an upgrade box. 3 levels of upgraded weapons.", DialogLayout.CENTER)
+game.show_long_text("Score points by shooting enemies. Lose points if they get past you. Hit multiple enemies in a row to spawn a weapon upgrade box. There are 3 levels of upgraded weapons. If you lose a ship most things reset. Have Fun!", DialogLayout.FULL)
 difficulty = game.ask("Press A for Easy mode", "or B for Hard mode.")
 set_starfield()
 spacePlane = sprites.create(img("""
@@ -151,7 +152,6 @@ spacePlane = sprites.create(img("""
 spacePlane.set_position(scene.screen_width() / 2, scene.screen_height())
 controller.move_sprite(spacePlane, 200, 0)
 spacePlane.set_stay_in_screen(True)
-info.set_life(3)
 
 missile_array = [img("""
         . . . . . . . . . . . . . . . .
@@ -279,7 +279,7 @@ hit_streak = 0
 temp_dead_count = 0
 temp_killed_count = 0
 upgrade_level = 0
-interval = 1000
+
 kill_count = 0
 bonus_missiles = 0
 speed_mult = 0
@@ -290,11 +290,17 @@ if difficulty == True:
     max_speed = 10
     y_speed = 20
     upgrade_speed = 20
+    info.set_life(5)
+    interval = 1500
+    enemy_projectile_speed = 75
 else:
     min_speed = 30
     max_speed = 40
     y_speed = 50
     upgrade_speed = 50
+    info.set_life(3)
+    interval = 1000
+    enemy_projectile_speed = 150
 
 controller.A.repeatInterval = 300
 controller.A.repeatDelay = 0
@@ -303,7 +309,6 @@ def on_a_pressed():
     if player_dead == True:
         return
     global bonus_missiles
-    #for i in range(3):
     missile = sprites.create_projectile_from_sprite(missile_array[missile_type], spacePlane, 0, -200)
     if missile_type == 3 and bonus_missiles % 3 == 1 :
         missile = sprites.create_projectile_from_sprite(missile_array[1], spacePlane, 200, -200)
@@ -311,7 +316,6 @@ def on_a_pressed():
         bonus_missiles += 1
     elif missile_type == 3:
         bonus_missiles += 1
-    #    pause(300)
 controller.A.on_event(ControllerButtonEvent.REPEATED, on_a_pressed)
 
 def create_bogey():
@@ -333,7 +337,7 @@ def create_bogey():
         . . . . . . . . . . . . . . . .
         . . . . . . . . . . . . . . . .
         . . . . . . . . . . . . . . . .
-        """), SpriteKind.enemy)
+    """), SpriteKind.enemy)
     bogey.set_velocity(0, randint(min_speed + speed_mult, max_speed + speed_mult)) 
     bogey.set_position(
         Math.constrain(randint(10, scene.screen_width() - 10), 
@@ -342,7 +346,7 @@ def create_bogey():
         0)
     bogey.set_flag(SpriteFlag.AutoDestroy, True)
     last_bogey_x = bogey.x
-    if missile_type > 0 and Math.percent_chance(10 + speed_mult):
+    if missile_type > 0 and Math.percent_chance(10 + speed_mult):     
         if bogey.x > scene.screen_width() / 2:
             bogey.vx = randint(-10, y_speed * -1)
         else:
@@ -365,6 +369,38 @@ def create_bogey():
             . . . . . . . . . . . . . . . .
             . . . . . . . . . . . . . . . .
         """))
+    elif missile_type > 1 and Math.percent_chance(10 + (speed_mult / 2)):
+        bogey.x = Math.constrain(bogey.x, 26, scene.screen_width()-26)
+        if bogey.x > scene.screen_width() / 2:
+            bogey.vx = -25.5
+        else:
+            bogey.vx = 25.5
+        bogey.set_image(img("""
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . 8 8 . . 8 8 . . . . .
+                . . . . . 8 5 . . 5 8 . . . . .
+                . . . . 5 . . . . . . 5 . . . .
+                . . . 8 . . . . . . . . 8 . . .
+                . . 5 . 7 7 7 8 8 7 7 7 . 5 . .
+                . . . . 2 7 7 7 7 7 7 2 . . . .
+                . . . . . 5 7 7 7 7 5 . . . . .
+                . . . . . . 2 7 7 2 . . . . . .
+                . . . . . 8 . a a . 8 . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+            """))
+
+
+def on_update_interval():
+    enemy_array = sprites.all_of_kind(SpriteKind.enemy)
+    for i in range(len(enemy_array)):
+        if Math.abs(enemy_array[i].vx) == 25.5:
+            enemy_array[i].vx = enemy_array[i].vx * -1
+game.on_update_interval(1000, on_update_interval)
 
 
 def on_forever():
@@ -393,6 +429,8 @@ sprites.on_overlap(SpriteKind.projectile, SpriteKind.enemy, on_overlap)
 
 def on_overlap2(sprite, otherSprite): #player crashes into enemy
     global player_dead, missile_type, hit_streak, temp_dead_count, temp_killed_count, upgrade_level, kill_count, last_bogey_x, speed_mult, interval
+    if player_dead == True:
+        return  
     player_dead = True
     #sprite.set_velocity(25, 25)
     sprite.start_effect(effects.disintegrate, 1000)
@@ -439,6 +477,56 @@ def on_overlap2(sprite, otherSprite): #player crashes into enemy
     speed_mult = 0
 sprites.on_overlap(SpriteKind.player, SpriteKind.enemy, on_overlap2)
 
+def on_overlap4(sprite, otherSprite): #player hit by enemy projectile
+    global player_dead, missile_type, hit_streak, temp_dead_count, temp_killed_count, upgrade_level, kill_count, last_bogey_x, speed_mult, interval
+    if player_dead == True:
+        return
+    player_dead = True
+    #sprite.set_velocity(25, 25)
+    sprite.start_effect(effects.disintegrate, 1000)
+    otherSprite.destroy(effects.disintegrate, 1000)
+    info.change_score_by(1)
+    controller.move_sprite(sprite, 0, 0)
+    scene.camera_shake(4,1000)
+    for i in range(1):
+        pause(1000)
+    sprite.set_image(img("""
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . 8 . . . . . . . .
+    . . . . . . . 8 . . . . . . . .
+    . . . . . . 8 8 8 . . . . . . .
+    . . . . . . 8 8 8 . . . . . . .
+    . . . . . 8 6 8 6 8 . . . . . .
+    . . . . . 8 6 8 6 8 . . . . . .
+    . . . . 8 6 7 8 7 6 8 . . . . .
+    . . . 7 8 6 7 8 7 6 8 7 . . . .
+    . 7 7 8 6 7 7 8 7 7 6 8 7 7 . .
+    . . . . . . 5 8 5 . . . . . . .
+    . . . . . . 2 . 2 . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    """))
+    enemy_array = sprites.all_of_kind(SpriteKind.enemy)
+    for i in range(len(enemy_array)):
+        info.change_score_by(1)
+        enemy_array[i].destroy()
+    sprite.set_position(scene.screen_width() / 2, scene.screen_height())
+    controller.move_sprite(spacePlane, 200, 0)
+    info.change_life_by(-1)
+    player_dead = False
+    missile_type = 0
+    temp_dead_count = 0
+    temp_killed_count = 0
+    hit_streak = 0
+    upgrade_level = 0
+    last_bogey_x = scene.screen_width() / 2
+    kill_count = Math.round(kill_count / 2) - (kill_count % 20) + 1
+    interval = interval * 1.25
+    speed_mult = 0
+sprites.on_overlap(SpriteKind.player, SpriteKind.badprojectile, on_overlap4)
+
 def on_destroyed(sprite):
     global temp_dead_count, temp_killed_count, hit_streak
     info.change_score_by(-1)
@@ -473,6 +561,11 @@ def on_update():
         """), 0, randint(20, 30))
         star.set_position (randint(0, scene.screen_width()), 0)
         star.set_flag(SpriteFlag.Ghost, True)
+    if missile_type >= 2 and player_dead == False:
+        enemy_array = sprites.all_of_kind(SpriteKind.enemy)
+        for i in range(len(enemy_array)):
+                if Math.percent_chance(1):
+                    enemy_missile = sprites.create_projectile(missile_array[missile_type], 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i],)
 game.on_update(on_update)
 
 def set_starfield():

@@ -3,8 +3,11 @@ let min_speed: number;
 let max_speed: number;
 let y_speed: number;
 let upgrade_speed: number;
+let interval: number;
+let enemy_projectile_speed: number;
 namespace SpriteKind {
     export const Upgrade = SpriteKind.create()
+    export const badprojectile = SpriteKind.create()
 }
 
 scene.setBackgroundImage(img`
@@ -133,7 +136,7 @@ for (i = 0; i < 1; i++) {
     pause(1000)
 }
 scene.setBackgroundImage(null)
-game.showLongText("Hit multiple enemies in a row for an upgrade box. 3 levels of upgraded weapons.", DialogLayout.Center)
+game.showLongText("Score points by shooting enemies. Lose points if they get past you. Hit multiple enemies in a row to spawn a weapon upgrade box. There are 3 levels of upgraded weapons. If you lose a ship most things reset. Have Fun!", DialogLayout.Full)
 let difficulty = game.ask("Press A for Easy mode", "or B for Hard mode.")
 set_starfield()
 let spacePlane = sprites.create(img`
@@ -157,7 +160,6 @@ let spacePlane = sprites.create(img`
 spacePlane.setPosition(scene.screenWidth() / 2, scene.screenHeight())
 controller.moveSprite(spacePlane, 200, 0)
 spacePlane.setStayInScreen(true)
-info.setLife(3)
 let missile_array = [img`
         . . . . . . . . . . . . . . . .
         . . . . . . . . . . . . . . . .
@@ -284,7 +286,6 @@ let hit_streak = 0
 let temp_dead_count = 0
 let temp_killed_count = 0
 let upgrade_level = 0
-let interval = 1000
 let kill_count = 0
 let bonus_missiles = 0
 let speed_mult = 0
@@ -295,23 +296,27 @@ if (difficulty == true) {
     max_speed = 10
     y_speed = 20
     upgrade_speed = 20
+    info.setLife(5)
+    interval = 1500
+    enemy_projectile_speed = 75
 } else {
     min_speed = 30
     max_speed = 40
     y_speed = 50
     upgrade_speed = 50
+    info.setLife(3)
+    interval = 1000
+    enemy_projectile_speed = 150
 }
 
 controller.A.repeatInterval = 300
 controller.A.repeatDelay = 0
-//     pause(300)
 controller.A.onEvent(ControllerButtonEvent.Repeated, function on_a_pressed() {
     if (player_dead == true) {
         return
     }
     
     
-    // for i in range(3):
     let missile = sprites.createProjectileFromSprite(missile_array[missile_type], spacePlane, 0, -200)
     if (missile_type == 3 && bonus_missiles % 3 == 1) {
         missile = sprites.createProjectileFromSprite(missile_array[1], spacePlane, 200, -200)
@@ -341,7 +346,7 @@ function create_bogey() {
         . . . . . . . . . . . . . . . .
         . . . . . . . . . . . . . . . .
         . . . . . . . . . . . . . . . .
-        `, SpriteKind.Enemy)
+    `, SpriteKind.Enemy)
     bogey.setVelocity(0, randint(min_speed + speed_mult, max_speed + speed_mult))
     bogey.setPosition(Math.constrain(randint(10, scene.screenWidth() - 10), Math.constrain(last_bogey_x - scene.screenWidth() / 4 - 10, 10, scene.screenWidth() - 10), Math.constrain(last_bogey_x + scene.screenWidth() / 4 + 10, 10, scene.screenWidth() - 10)), 0)
     bogey.setFlag(SpriteFlag.AutoDestroy, true)
@@ -371,10 +376,45 @@ function create_bogey() {
             . . . . . . . . . . . . . . . .
             . . . . . . . . . . . . . . . .
         `)
+    } else if (missile_type > 1 && Math.percentChance(10 + speed_mult / 2)) {
+        bogey.x = Math.constrain(bogey.x, 26, scene.screenWidth() - 26)
+        if (bogey.x > scene.screenWidth() / 2) {
+            bogey.vx = -25.5
+        } else {
+            bogey.vx = 25.5
+        }
+        
+        bogey.setImage(img`
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . 8 8 . . 8 8 . . . . .
+                . . . . . 8 5 . . 5 8 . . . . .
+                . . . . 5 . . . . . . 5 . . . .
+                . . . 8 . . . . . . . . 8 . . .
+                . . 5 . 7 7 7 8 8 7 7 7 . 5 . .
+                . . . . 2 7 7 7 7 7 7 2 . . . .
+                . . . . . 5 7 7 7 7 5 . . . . .
+                . . . . . . 2 7 7 2 . . . . . .
+                . . . . . 8 . a a . 8 . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+            `)
     }
     
 }
 
+game.onUpdateInterval(1000, function on_update_interval() {
+    let enemy_array = sprites.allOfKind(SpriteKind.Enemy)
+    for (let i = 0; i < enemy_array.length; i++) {
+        if (Math.abs(enemy_array[i].vx) == 25.5) {
+            enemy_array[i].vx = enemy_array[i].vx * -1
+        }
+        
+    }
+})
 forever(function on_forever() {
     
     create_bogey()
@@ -409,6 +449,65 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function on_overlap(s
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_overlap2(sprite: Sprite, otherSprite: Sprite) {
     let i: number;
     // player crashes into enemy
+    
+    if (player_dead == true) {
+        return
+    }
+    
+    player_dead = true
+    // sprite.set_velocity(25, 25)
+    sprite.startEffect(effects.disintegrate, 1000)
+    otherSprite.destroy(effects.disintegrate, 1000)
+    info.changeScoreBy(1)
+    controller.moveSprite(sprite, 0, 0)
+    scene.cameraShake(4, 1000)
+    for (i = 0; i < 1; i++) {
+        pause(1000)
+    }
+    sprite.setImage(img`
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . 8 . . . . . . . .
+    . . . . . . . 8 . . . . . . . .
+    . . . . . . 8 8 8 . . . . . . .
+    . . . . . . 8 8 8 . . . . . . .
+    . . . . . 8 6 8 6 8 . . . . . .
+    . . . . . 8 6 8 6 8 . . . . . .
+    . . . . 8 6 7 8 7 6 8 . . . . .
+    . . . 7 8 6 7 8 7 6 8 7 . . . .
+    . 7 7 8 6 7 7 8 7 7 6 8 7 7 . .
+    . . . . . . 5 8 5 . . . . . . .
+    . . . . . . 2 . 2 . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . .
+    `)
+    let enemy_array = sprites.allOfKind(SpriteKind.Enemy)
+    for (i = 0; i < enemy_array.length; i++) {
+        info.changeScoreBy(1)
+        enemy_array[i].destroy()
+    }
+    sprite.setPosition(scene.screenWidth() / 2, scene.screenHeight())
+    controller.moveSprite(spacePlane, 200, 0)
+    info.changeLifeBy(-1)
+    player_dead = false
+    missile_type = 0
+    temp_dead_count = 0
+    temp_killed_count = 0
+    hit_streak = 0
+    upgrade_level = 0
+    last_bogey_x = scene.screenWidth() / 2
+    kill_count = Math.round(kill_count / 2) - kill_count % 20 + 1
+    interval = interval * 1.25
+    speed_mult = 0
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.badprojectile, function on_overlap4(sprite: Sprite, otherSprite: Sprite) {
+    let i: number;
+    // player hit by enemy projectile
+    
+    if (player_dead == true) {
+        return
+    }
     
     player_dead = true
     // sprite.set_velocity(25, 25)
@@ -474,6 +573,8 @@ sprites.onDestroyed(SpriteKind.Enemy, function on_destroyed(sprite: Sprite) {
 })
 game.onUpdate(function on_update() {
     let star: Sprite;
+    let enemy_array: Sprite[];
+    let enemy_missile: Sprite;
     if (Math.percentChance(25)) {
         // adds new stars to starfield
         star = sprites.createProjectileFromSide(img`
@@ -496,6 +597,16 @@ game.onUpdate(function on_update() {
         `, 0, randint(20, 30))
         star.setPosition(randint(0, scene.screenWidth()), 0)
         star.setFlag(SpriteFlag.Ghost, true)
+    }
+    
+    if (missile_type >= 2 && player_dead == false) {
+        enemy_array = sprites.allOfKind(SpriteKind.Enemy)
+        for (let i = 0; i < enemy_array.length; i++) {
+            if (Math.percentChance(1)) {
+                enemy_missile = sprites.createProjectile(missile_array[missile_type], 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i])
+            }
+            
+        }
     }
     
 })
