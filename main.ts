@@ -407,13 +407,25 @@ function create_bogey() {
 }
 
 game.onUpdateInterval(1000, function on_update_interval() {
+    let i: number;
+    let enemy_missile: Sprite;
     let enemy_array = sprites.allOfKind(SpriteKind.Enemy)
-    for (let i = 0; i < enemy_array.length; i++) {
+    for (i = 0; i < enemy_array.length; i++) {
         if (Math.abs(enemy_array[i].vx) == 25.5) {
             enemy_array[i].vx = enemy_array[i].vx * -1
         }
         
     }
+    if (missile_type >= 2 && player_dead == false) {
+        // shoot badprojectiles
+        for (i = 0; i < enemy_array.length; i++) {
+            if (enemy_array[i].y < scene.screenHeight() / 2 * 3 && Math.percentChance(1)) {
+                enemy_missile = sprites.createProjectile(missile_array[0], 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i])
+            }
+            
+        }
+    }
+    
 })
 forever(function on_forever() {
     
@@ -573,8 +585,6 @@ sprites.onDestroyed(SpriteKind.Enemy, function on_destroyed(sprite: Sprite) {
 })
 game.onUpdate(function on_update() {
     let star: Sprite;
-    let enemy_array: Sprite[];
-    let enemy_missile: Sprite;
     if (Math.percentChance(25)) {
         // adds new stars to starfield
         star = sprites.createProjectileFromSide(img`
@@ -597,17 +607,6 @@ game.onUpdate(function on_update() {
         `, 0, randint(20, 30))
         star.setPosition(randint(0, scene.screenWidth()), 0)
         star.setFlag(SpriteFlag.Ghost, true)
-    }
-    
-    if (missile_type >= 2 && player_dead == false) {
-        // shoot badprojectiles
-        enemy_array = sprites.allOfKind(SpriteKind.Enemy)
-        for (let i = 0; i < enemy_array.length; i++) {
-            if (enemy_array[i].y < scene.screenHeight() / 2 * 3 && Math.percentChance(.1)) {
-                enemy_missile = sprites.createProjectile(missile_array[0], 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i])
-            }
-            
-        }
     }
     
 })
