@@ -411,6 +411,7 @@ game.onUpdateInterval(1000, function on_update_interval() {
     let enemy_missile: Sprite;
     let enemy_array = sprites.allOfKind(SpriteKind.Enemy)
     for (i = 0; i < enemy_array.length; i++) {
+        // move vibrating enemies back and forth
         if (Math.abs(enemy_array[i].vx) == 25.5) {
             enemy_array[i].vx = enemy_array[i].vx * -1
         }
@@ -420,7 +421,24 @@ game.onUpdateInterval(1000, function on_update_interval() {
         // shoot badprojectiles
         for (i = 0; i < enemy_array.length; i++) {
             if (enemy_array[i].y < scene.screenHeight() / 2 * 3 && Math.percentChance(1)) {
-                enemy_missile = sprites.createProjectile(missile_array[0], 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i])
+                enemy_missile = sprites.createProjectile(img`
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . 5 . . . . . . . .
+                    . . . . . . . 5 . . . . . . . .
+                    . . . . . . . 5 . . . . . . . .
+                    . . . . . . . 5 . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                `, 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i])
             }
             
         }
@@ -509,7 +527,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function on_overlap2(spri
     hit_streak = 0
     upgrade_level = 0
     last_bogey_x = scene.screenWidth() / 2
-    kill_count = Math.round(kill_count / 2) - kill_count % 20 + 1
+    kill_count = Math.round(Math.constrain(kill_count / 2 - kill_count % 20 + 1, 0, 100000))
     interval = interval * 1.25
     speed_mult = 0
 })

@@ -397,13 +397,30 @@ def create_bogey():
 
 def on_update_interval():
     enemy_array = sprites.all_of_kind(SpriteKind.enemy)
-    for i in range(len(enemy_array)):
+    for i in range(len(enemy_array)):   #move vibrating enemies back and forth
         if Math.abs(enemy_array[i].vx) == 25.5:
             enemy_array[i].vx = enemy_array[i].vx * -1
     if missile_type >= 2 and player_dead == False: #shoot badprojectiles
         for i in range(len(enemy_array)):
             if enemy_array[i].y < (scene.screen_height() / 2 * 3) and Math.percent_chance(1):
-                enemy_missile = sprites.create_projectile(missile_array[0], 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i],)
+                enemy_missile = sprites.create_projectile(img("""
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . 5 . . . . . . . .
+                    . . . . . . . 5 . . . . . . . .
+                    . . . . . . . 5 . . . . . . . .
+                    . . . . . . . 5 . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                    . . . . . . . . . . . . . . . .
+                """), 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i],)
 game.on_update_interval(1000, on_update_interval)
 
 
@@ -476,7 +493,7 @@ def on_overlap2(sprite, otherSprite): #player crashes into enemy
     hit_streak = 0
     upgrade_level = 0
     last_bogey_x = scene.screen_width() / 2
-    kill_count = Math.round(kill_count / 2) - (kill_count % 20) + 1
+    kill_count = Math.round(Math.constrain((kill_count / 2) - (kill_count % 20) + 1, 0, 100000))
     interval = interval * 1.25
     speed_mult = 0
 sprites.on_overlap(SpriteKind.player, SpriteKind.enemy, on_overlap2)
