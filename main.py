@@ -292,7 +292,7 @@ if difficulty == True:
     upgrade_speed = 20
     info.set_life(5)
     interval = 1500
-    enemy_projectile_speed = 75
+    enemy_projectile_speed = 50
 else:
     min_speed = 30
     max_speed = 40
@@ -300,7 +300,7 @@ else:
     upgrade_speed = 50
     info.set_life(3)
     interval = 1000
-    enemy_projectile_speed = 150
+    enemy_projectile_speed = 125
 
 controller.A.repeatInterval = 300
 controller.A.repeatDelay = 0
@@ -561,11 +561,11 @@ def on_update():
         """), 0, randint(20, 30))
         star.set_position (randint(0, scene.screen_width()), 0)
         star.set_flag(SpriteFlag.Ghost, True)
-    if missile_type >= 2 and player_dead == False:
+    if missile_type >= 2 and player_dead == False: #shoot badprojectiles
         enemy_array = sprites.all_of_kind(SpriteKind.enemy)
         for i in range(len(enemy_array)):
-                if Math.percent_chance(1):
-                    enemy_missile = sprites.create_projectile(missile_array[missile_type], 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i],)
+                if enemy_array[i].y < (scene.screen_height() / 2 * 3) and Math.percent_chance(.1):
+                    enemy_missile = sprites.create_projectile(missile_array[0], 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i],)
 game.on_update(on_update)
 
 def set_starfield():

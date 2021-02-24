@@ -298,7 +298,7 @@ if (difficulty == true) {
     upgrade_speed = 20
     info.setLife(5)
     interval = 1500
-    enemy_projectile_speed = 75
+    enemy_projectile_speed = 50
 } else {
     min_speed = 30
     max_speed = 40
@@ -306,7 +306,7 @@ if (difficulty == true) {
     upgrade_speed = 50
     info.setLife(3)
     interval = 1000
-    enemy_projectile_speed = 150
+    enemy_projectile_speed = 125
 }
 
 controller.A.repeatInterval = 300
@@ -600,10 +600,11 @@ game.onUpdate(function on_update() {
     }
     
     if (missile_type >= 2 && player_dead == false) {
+        // shoot badprojectiles
         enemy_array = sprites.allOfKind(SpriteKind.Enemy)
         for (let i = 0; i < enemy_array.length; i++) {
-            if (Math.percentChance(1)) {
-                enemy_missile = sprites.createProjectile(missile_array[missile_type], 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i])
+            if (enemy_array[i].y < scene.screenHeight() / 2 * 3 && Math.percentChance(.1)) {
+                enemy_missile = sprites.createProjectile(missile_array[0], 0, enemy_projectile_speed, SpriteKind.badprojectile, enemy_array[i])
             }
             
         }
